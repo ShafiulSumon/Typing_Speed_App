@@ -3,13 +3,15 @@ import { generate, count } from "random-words";
 import "bulma/css/bulma.min.css";
 
 const NUMB_OF_WORDS = 200;
-const SECONDS = 10;
+const SECONDS = 30;
 
 function App() {
   const [words, setWords] = useState([]);
   const [countDown, setCountDown] = useState(SECONDS);
   const [currInput, setCurrInput] = useState("");
   const [currWordIndex, setCurrWordIndex] = useState(0);
+  const [currChar, setCurrChar] = useState("");
+  const [currCharIndex, setCurrCharIndex] = useState(-1);
   const [correct, setCorrect] = useState(0);
   const [incorrect, setIncorrect] = useState(0);
   const [status, setStatus] = useState("waiting");
@@ -35,6 +37,8 @@ function App() {
       setCurrWordIndex(0);
       setCorrect(0);
       setIncorrect(0);
+      setCurrCharIndex(-1);
+      setCurrChar("");
     }
     if(status !== "started") {
       setStatus("started");
@@ -67,11 +71,37 @@ function App() {
     }
   }
 
-  function handleKeyDown({keyCode}) {
+  function handleKeyDown({keyCode, key}) {
     if(keyCode === 32) {
       checkMatch();
       setCurrInput("");
       setCurrWordIndex(currWordIndex + 1);
+      setCurrCharIndex(-1);
+    }
+    else if(keyCode ===  8) {
+      setCurrCharIndex(currCharIndex==-1 ? -1 : currCharIndex - 1);
+      setCurrChar("");
+    }
+    else {
+      setCurrCharIndex(currCharIndex + 1);
+      setCurrChar(key);
+    }
+  }
+
+  function getCharClass(wordIdx, charIdx, char) {
+    if(wordIdx === currWordIndex && charIdx === currCharIndex && currChar && status !== "finished") {
+      if(char === currChar) {
+        return "has-background-success";
+      }
+      else {
+        return "has-background-danger";
+      }
+    }
+    else if(wordIdx === currWordIndex && currCharIndex >= words[currWordIndex].length) {
+      return "has-background-danger";
+    }
+    else {
+      return "";
     }
   }
 
@@ -110,7 +140,7 @@ function App() {
                   <span key={index}>
                     <span>
                       {word.split("").map((char, i) => (
-                        <span key={i}>{char}</span>
+                        <span className={getCharClass(index, i, char)} key={i}>{char}</span>
                       ))}
                     </span>
                     <span> </span>
