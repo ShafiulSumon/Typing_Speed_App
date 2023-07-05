@@ -15,7 +15,9 @@ function App() {
   const [correct, setCorrect] = useState(0);
   const [incorrect, setIncorrect] = useState(0);
   const [status, setStatus] = useState("waiting");
+  const [btnHidden, setBtnHidden] = useState(false);
   const textInput = useRef(null);
+
 
   useEffect(() => {
     if(status === "started") {
@@ -32,6 +34,7 @@ function App() {
   }
 
   function startTimer() {
+    setBtnHidden(true);
     if(status === "finished") {
       setWords(generateWords());
       setCurrWordIndex(0);
@@ -47,6 +50,7 @@ function App() {
           setCountDown((prev) => {
             if (prev === 0) {
               clearInterval(interval);
+              setBtnHidden(false);
               setCurrInput("");
               setStatus("finished");
               return SECONDS;
@@ -125,7 +129,7 @@ function App() {
         />
       </div>
 
-      <div className="section">
+      <div hidden={btnHidden} className="section">
         <button className="button is-info is-fullwidth" onClick={startTimer}>
           Start
         </button>
